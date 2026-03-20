@@ -74,6 +74,22 @@ namespace CosmosApi.Endpoints
                 var saved = await db.SaveChangesAsync();
                 return saved > 0 ? TypedResults.Ok(invoice) : TypedResults.BadRequest();
             });
+
+            app.MapDelete("/invoices/{invoiceId}", async Task<IResult> (long invoiceId, AppDbContext db) =>
+            {
+                var invoice = await db.Invoices
+                    .Include(i => i.InvoiceItems)
+                    .FirstOrDefaultAsync(i => i.InvoiceId == invoiceId);
+
+                if (invoice is null)
+                {
+                    return TypedResults.NotFound();
+                }
+
+                db.Invoices.Remove(invoice);
+                var saved = await db.SaveChangesAsync();
+                return saved > 0 ? TypedResults.Ok(true) : TypedResults.BadRequest();
+            });
         }
     }
 }
