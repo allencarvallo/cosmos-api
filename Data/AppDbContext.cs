@@ -33,7 +33,8 @@ namespace CosmosApi.Data
 
                 entity.HasOne(e => e.Invoice)
                         .WithMany(e => e.InvoiceItems)
-                        .HasForeignKey(e => e.InvoiceId);
+                        .HasForeignKey(e => e.InvoiceId)
+                        .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Customer>(entity =>
