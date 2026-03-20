@@ -13,7 +13,7 @@ namespace CosmosApi.Endpoints
             {
                 var invoices = await db.Invoices
                     .Include(i => i.Customer)
-                    .Select(i => new InvoiceDto(
+                    .Select(i => new InvoiceResponse(
                             i.InvoiceId,
                             i.InvoiceNumber,
                             i.InvoiceDate,

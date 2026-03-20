@@ -1,6 +1,6 @@
 ﻿namespace CosmosApi.DTOs
 {
-    public record InvoiceDto(
+    public record InvoiceResponse(
         long InvoiceId,
         string InvoiceNumber,
         DateOnly InvoiceDate,
