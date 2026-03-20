@@ -10,7 +10,7 @@ namespace CosmosApi.Endpoints
     {
         public static void RegisterInvoiceEndpoints(this WebApplication app)
         {
-            app.MapGet("/invoices", async Task<Ok<List<InvoiceDto>>> (AppDbContext db) =>
+            app.MapGet("/invoices", async Task<IResult> (AppDbContext db) =>
             {
                 var invoices = await db.Invoices
                     .Include(i => i.Customer)
@@ -25,7 +25,7 @@ namespace CosmosApi.Endpoints
                 return TypedResults.Ok(invoices);
             });
 
-            app.MapPost("/invoices", async Task<Results<Ok<bool>, BadRequest<bool>>> (CreateInvoiceRequest req, AppDbContext db) =>
+            app.MapPost("/invoices", async Task<IResult> (CreateInvoiceRequest req, AppDbContext db) =>
             {
                 var invoice = new Invoice
                 {
