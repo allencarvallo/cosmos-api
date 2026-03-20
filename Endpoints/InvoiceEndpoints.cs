@@ -12,16 +12,36 @@ namespace CosmosApi.Endpoints
             app.MapGet("/invoices", async Task<IResult> (AppDbContext db) =>
             {
                 var invoices = await db.Invoices
-                    .Include(i => i.Customer)
-                    .Select(i => new InvoiceResponse(
-                            i.InvoiceId,
-                            i.InvoiceNumber,
-                            i.InvoiceDate,
-                            i.InvoiceAmount,
-                            i.Customer.Name
+                    .Select(i => new InvoiceListResponse(
+                        i.InvoiceId,
+                        i.InvoiceNumber,
+                        i.InvoiceDate,
+                        i.InvoiceAmount,
+                        i.Customer.Name
                     )).ToListAsync();
 
                 return TypedResults.Ok(invoices);
+            });
+
+            app.MapGet("/invoices/{invoiceId}", async Task<IResult> (long invoiceId, AppDbContext db) =>
+            {
+                var invoice = await db.Invoices
+                    .Where(i => i.InvoiceId == invoiceId)
+                    .Select(i => new InvoiceResponse(
+                        i.InvoiceId,
+                        i.InvoiceNumber,
+                        i.InvoiceDate,
+                        i.InvoiceAmount,
+                        i.CustomerId,
+                        i.InvoiceItems.Select(item => new InvoiceItemResponse(
+                            item.InvoiceItemId,
+                            item.Description,
+                            item.Quantity,
+                            item.Rate,
+                            item.Amount)).ToList()))
+                    .FirstOrDefaultAsync();
+
+                return invoice is null ? TypedResults.NotFound() : TypedResults.Ok(invoice);
             });
 
             app.MapPost("/invoices", async Task<IResult> (CreateInvoiceRequest req, AppDbContext db) =>
