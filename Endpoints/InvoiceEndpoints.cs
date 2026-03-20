@@ -1,7 +1,6 @@
 ﻿using CosmosApi.Data;
 using CosmosApi.DTOs;
 using CosmosApi.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace CosmosApi.Endpoints
