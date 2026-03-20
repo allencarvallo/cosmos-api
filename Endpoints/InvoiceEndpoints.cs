@@ -48,7 +48,7 @@ namespace CosmosApi.Endpoints
                 return saved > 0 ? TypedResults.Ok(true) : TypedResults.BadRequest(false);
             });
 
-            app.MapPut("/invoices/{id}", async Task<IResult> (long invoiceId, CreateInvoiceRequest req, AppDbContext db) =>
+            app.MapPut("/invoices/{invoiceId}", async Task<IResult> (long invoiceId, CreateInvoiceRequest req, AppDbContext db) =>
             {
                 var invoice = await db.Invoices
                     .Include(i => i.InvoiceItems)
