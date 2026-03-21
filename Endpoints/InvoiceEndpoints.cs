@@ -1,7 +1,9 @@
 ﻿using CosmosApi.Data;
+using CosmosApi.Documents;
 using CosmosApi.DTOs;
 using CosmosApi.Models;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Fluent;
 
 namespace CosmosApi.Endpoints
 {
@@ -109,6 +111,38 @@ namespace CosmosApi.Endpoints
                 db.Invoices.Remove(invoice);
                 var saved = await db.SaveChangesAsync();
                 return saved > 0 ? TypedResults.Ok(true) : TypedResults.BadRequest();
+            });
+
+            app.MapGet("/invoices/{invoiceId}/pdf", async Task<IResult> (long invoiceId, AppDbContext db) =>
+            {
+                var invoice = await db.Invoices
+                    .Include(i => i.Customer)
+                    .Include(i => i.InvoiceItems)
+                    .FirstOrDefaultAsync(i => i.InvoiceId == invoiceId);
+
+                if (invoice is null)
+                    return TypedResults.NotFound();
+
+                var model = new InvoicePdfModel
+                {
+                    InvoiceNumber = invoice.InvoiceNumber,
+                    InvoiceDate = invoice.InvoiceDate,
+                    InvoiceAmount = invoice.InvoiceAmount,
+                    CustomerName = invoice.Customer.Name,
+                    CustomerEmail = invoice.Customer.Email,
+                    CustomerPhone = invoice.Customer.Phone,
+                    Items = invoice.InvoiceItems.Select(i => new InvoiceItemPdfModel
+                    {
+                        Description = i.Description,
+                        Quantity = i.Quantity,
+                        Rate = i.Rate,
+                        Amount = i.Amount
+                    }).ToList()
+                };
+
+                var pdf = new InvoiceDocument(model).GeneratePdf();
+
+                return Results.File(pdf, "application/pdf", $"Invoice-{invoice.InvoiceNumber}.pdf");
             });
         }
     }
