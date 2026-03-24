@@ -215,8 +215,8 @@ namespace CosmosApi.Documents
 
                     table.Cell().Background(bg).Padding(8).Text(item.Description);
                     table.Cell().Background(bg).Padding(8).AlignRight().Text(item.Quantity.ToString());
-                    table.Cell().Background(bg).Padding(8).AlignRight().Text($"${item.Rate:N2}");
-                    table.Cell().Background(bg).Padding(8).AlignRight().Text($"${item.Amount:N2}");
+                    table.Cell().Background(bg).Padding(8).AlignRight().Text($"₹{item.Rate:N2}");
+                    table.Cell().Background(bg).Padding(8).AlignRight().Text($"₹{item.Amount:N2}");
                 }
             });
         }
@@ -234,13 +234,13 @@ namespace CosmosApi.Documents
                 col.Item().PaddingTop(8).Row(row =>
                 {
                     row.RelativeItem().Text("Subtotal").FontColor(TextMuted);
-                    row.ConstantItem(100).AlignRight().Text($"${subtotal:N2}");
+                    row.ConstantItem(100).AlignRight().Text($"₹{subtotal:N2}");
                 });
 
                 col.Item().PaddingTop(4).Row(row =>
                 {
                     row.RelativeItem().Text("Tax (0%)").FontColor(TextMuted);
-                    row.ConstantItem(100).AlignRight().Text($"${tax:N2}");
+                    row.ConstantItem(100).AlignRight().Text($"₹{tax:N2}");
                 });
 
                 col.Item().PaddingTop(8).LineHorizontal(1).LineColor(BorderGray);
@@ -251,7 +251,7 @@ namespace CosmosApi.Documents
                     .Row(row =>
                     {
                         row.RelativeItem().Text("TOTAL DUE").FontColor(Colors.White).Bold();
-                        row.ConstantItem(100).AlignRight().Text($"${total:N2}").FontColor(Colors.White).Bold().FontSize(12);
+                        row.ConstantItem(100).AlignRight().Text($"₹{total:N2}").FontColor(Colors.White).Bold().FontSize(12);
                     });
             });
         }
