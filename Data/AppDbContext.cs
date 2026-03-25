@@ -8,6 +8,7 @@ namespace CosmosApi.Data
         public DbSet<Invoice> Invoices => Set<Invoice>();
         public DbSet<InvoiceItem> InvoiceItems => Set<InvoiceItem>();
         public DbSet<Customer> Customers => Set<Customer>();
+        public DbSet<InvoiceSequenceTracker> InvoiceSequenceTrackers => Set<InvoiceSequenceTracker>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -44,6 +45,13 @@ namespace CosmosApi.Data
                 entity.Property(e => e.Phone).IsRequired(false).HasMaxLength(20);
                 entity.Property(e => e.Email).IsRequired(false).HasMaxLength(100);
                 entity.Property(e => e.Description).IsRequired(false).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<InvoiceSequenceTracker>(entity =>
+            {
+                entity.HasKey(e => e.InvoiceSequenceTrackerId);
+                entity.Property(e => e.Year).IsRequired();
+                entity.Property(e => e.LastSequence).IsRequired();
             });
         }
     }

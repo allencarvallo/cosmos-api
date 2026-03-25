@@ -4,6 +4,7 @@ using CosmosApi.DTOs;
 using CosmosApi.Models;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Fluent;
+using System.Data;
 
 namespace CosmosApi.Endpoints
 {
@@ -48,26 +49,53 @@ namespace CosmosApi.Endpoints
 
             app.MapPost("/invoices", async Task<IResult> (CreateInvoiceRequest req, AppDbContext db) =>
             {
-                var invoice = new Invoice
+                using var transaction = await db.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+
+                try
                 {
-                    InvoiceNumber = Guid.NewGuid().ToString(),
-                    InvoiceDate = req.InvoiceDate,
-                    InvoiceAmount = req.InvoiceAmount,
-                    CustomerId = req.CustomerId,
-                    InvoiceItems = req.InvoiceItems
-                        .Select(i => new InvoiceItem
-                        {
-                            Description = i.Description,
-                            Quantity = i.Quantity,
-                            Rate = i.Rate,
-                            Amount = i.Amount,
-                        }).ToList()
-                };
+                    var ist = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
+                    var year = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, ist).Year;
 
-                db.Invoices.Add(invoice);
-                var saved = await db.SaveChangesAsync();
+                    var tracker = await db.InvoiceSequenceTrackers
+                        .FirstOrDefaultAsync(t => t.Year == year);
 
-                return saved > 0 ? TypedResults.Ok(true) : TypedResults.BadRequest(false);
+                    if (tracker == null)
+                    {
+                        tracker = new InvoiceSequenceTracker { Year = year, LastSequence = 0 };
+                        db.InvoiceSequenceTrackers.Add(tracker);
+                    }
+
+                    tracker.LastSequence += 1;
+                    await db.SaveChangesAsync();
+
+                    var invoice = new Invoice
+                    {
+                        InvoiceNumber = $"COS-{year}-{tracker.LastSequence:D4}",
+                        InvoiceDate = req.InvoiceDate,
+                        InvoiceAmount = req.InvoiceAmount,
+                        CustomerId = req.CustomerId,
+                        InvoiceItems = req.InvoiceItems
+                            .Select(i => new InvoiceItem
+                            {
+                                Description = i.Description,
+                                Quantity = i.Quantity,
+                                Rate = i.Rate,
+                                Amount = i.Amount,
+                            }).ToList()
+                    };
+
+                    db.Invoices.Add(invoice);
+                    await db.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+
+                    return TypedResults.Ok(true);
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    return TypedResults.BadRequest(false);
+                }
             });
 
             app.MapPut("/invoices/{invoiceId}", async Task<IResult> (long invoiceId, CreateInvoiceRequest req, AppDbContext db) =>
