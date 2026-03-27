@@ -5,11 +5,13 @@
         string Name,
         string Phone,
         string Email,
+        string Address,
         string Description);
 
     public record CreateCustomerRequest(
         string Name,
         string? Phone,
         string? Email,
+        string? Address,
         string? Description);
 }

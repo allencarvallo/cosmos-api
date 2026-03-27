@@ -12,11 +12,13 @@ namespace CosmosApi.Endpoints
             app.MapGet("/customers", async Task<IResult> (AppDbContext db) =>
             {
                 var customers = await db.Customers
+                    .OrderByDescending(c => c.CustomerId)
                     .Select(c => new CustomerResponse(
                         c.CustomerId,
                         c.Name,
                         c.Phone,
                         c.Email,
+                        c.Address,
                         c.Description))
                     .ToListAsync();
                 return TypedResults.Ok(customers);
@@ -31,6 +33,7 @@ namespace CosmosApi.Endpoints
                         c.Name,
                         c.Phone,
                         c.Email,
+                        c.Address,
                         c.Description))
                     .FirstOrDefaultAsync();
 
@@ -44,6 +47,7 @@ namespace CosmosApi.Endpoints
                     Name = req.Name,
                     Phone = req.Phone ?? string.Empty,
                     Email = req.Email ?? string.Empty,
+                    Address = req.Address ?? string.Empty,
                     Description = req.Description ?? string.Empty
                 };
 
@@ -62,6 +66,7 @@ namespace CosmosApi.Endpoints
                 customer.Name = req.Name;
                 customer.Phone = req.Phone ?? string.Empty;
                 customer.Email = req.Email ?? string.Empty;
+                customer.Address = req.Address ?? string.Empty;
                 customer.Description = req.Description ?? string.Empty;
 
                 var saved = await db.SaveChangesAsync();

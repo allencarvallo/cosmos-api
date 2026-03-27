@@ -44,6 +44,7 @@ namespace CosmosApi.Data
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.Phone).IsRequired(false).HasMaxLength(20);
                 entity.Property(e => e.Email).IsRequired(false).HasMaxLength(100);
+                entity.Property(e => e.Address).IsRequired(false).HasMaxLength(500);
                 entity.Property(e => e.Description).IsRequired(false).HasMaxLength(500);
             });
 
