@@ -122,7 +122,7 @@ namespace CosmosApi.Endpoints
                     }).ToList();
 
                 var saved = await db.SaveChangesAsync();
-                return saved > 0 ? TypedResults.Ok(invoice) : TypedResults.BadRequest();
+                return saved > 0 ? TypedResults.Ok(true) : TypedResults.BadRequest();
             });
 
             app.MapDelete("/invoices/{invoiceId}", async Task<IResult> (long invoiceId, AppDbContext db) =>
