@@ -15,6 +15,7 @@ namespace CosmosApi.Endpoints
             app.MapGet("/invoices", async Task<IResult> (AppDbContext db) =>
             {
                 var invoices = await db.Invoices
+                    .OrderByDescending(x => x.InvoiceId)
                     .Select(i => new InvoiceListResponse(
                         i.InvoiceId,
                         i.InvoiceNumber,
