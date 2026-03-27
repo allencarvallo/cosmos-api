@@ -16,4 +16,9 @@
     <PackageReference Include="QuestPDF" Version="2026.2.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Assets\logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
