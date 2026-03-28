@@ -160,6 +160,9 @@ namespace CosmosApi.Endpoints
                     CustomerName = invoice.Customer.Name,
                     CustomerEmail = invoice.Customer.Email,
                     CustomerPhone = invoice.Customer.Phone,
+                    CustomerAddress = invoice.Customer.Address,
+                    PlaceOfSupply = "India",
+                    LogoPath = Path.Combine(AppContext.BaseDirectory, "Assets", "logo.png"),
                     Items = invoice.InvoiceItems.Select(i => new InvoiceItemPdfModel
                     {
                         Description = i.Description,
